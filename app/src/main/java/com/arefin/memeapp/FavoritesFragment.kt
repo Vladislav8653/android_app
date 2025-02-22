@@ -22,8 +22,6 @@ class FavoritesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        //return inflater.inflate(R.layout.fragment_favorites, container, false)
         val view = inflater.inflate(R.layout.fragment_favorites, container, false)
         recyclerView = view.findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -46,10 +44,6 @@ class FavoritesFragment : Fragment() {
                 val favoriteMemes = mutableListOf<Meme>()
                 for (snapshot in dataSnapshot.children) {
                     val meme = snapshot.getValue(Meme::class.java)
-                    if (meme?.isFavorite == true) {
-                        meme.key = snapshot.key // Сохраняем ключ документа
-                        favoriteMemes.add(meme)
-                    }
                 }
                 // Обновите адаптер или UI с использованием списка favoriteMemes
                 updateFavoritesUI(favoriteMemes)
@@ -78,7 +72,7 @@ class FavoritesFragment : Fragment() {
 
 
     private fun removeFromFavorites(meme: Meme) {
-        meme.isFavorite = false // Устанавливаем isFavorite в false
+        /*meme.isFavorite = false // Устанавливаем isFavorite в false
         // Обновляем мем в базе данных
         meme.key?.let { key ->
             databaseReference.child(key).setValue(meme).addOnCompleteListener { task ->
@@ -88,6 +82,6 @@ class FavoritesFragment : Fragment() {
                     Toast.makeText(requireContext(), "Ошибка при удалении из избранного", Toast.LENGTH_SHORT).show()
                 }
             }
-        }
+        }*/
     }
 }

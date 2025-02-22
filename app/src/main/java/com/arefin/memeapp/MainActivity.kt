@@ -7,9 +7,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -24,6 +22,7 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var database: FirebaseDatabase
     private lateinit var databaseReference: DatabaseReference
+    private val databaseUrl = "https://memeapp-147f1-default-rtdb.europe-west1.firebasedatabase.app"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +74,7 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
         }
 
         findViewById<Button>(R.id.btn_profile).setOnClickListener {
-            //showFragment(ProfileFragment())
+            showFragment(UserProfileFragment())
         }
     }
 
@@ -86,17 +85,9 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
     }
 
     fun addToFavorites(meme: Meme) {
-        meme.isFavorite = true // Устанавливаем isFavorite в true
-        // Обновляем мем в базе данных
-        meme.key?.let { key ->
-            databaseReference.child(key).setValue(meme).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Toast.makeText(this, "${meme.title} добавлен в избранное", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Ошибка при добавлении в избранное", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
+        val ref = FirebaseDatabase.getInstance().getReference(databaseUrl).child("users").child("user1").child("interests")
+        ref.setValue(meme.id)
+        Toast.makeText(this, "Ready", Toast.LENGTH_SHORT).show()
     }
 
 
@@ -126,17 +117,8 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
             }
     }
 
-    private fun showMainList() {
-        FirebaseApp.initializeApp(this)
-        setContentView(R.layout.activity_main)
-        //recyclerView = findViewById(R.id.recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        loadMemes()
-    }
-
 
     private fun loadMemes() {
-        val databaseUrl = "https://memeapp-147f1-default-rtdb.europe-west1.firebasedatabase.app"
         database = FirebaseDatabase.getInstance(databaseUrl)
         databaseReference = database.getReference("memes")
 

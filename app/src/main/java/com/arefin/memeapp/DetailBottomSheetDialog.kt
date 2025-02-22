@@ -47,7 +47,6 @@ class DetailBottomSheetDialog(private val meme: Meme) : BottomSheetDialogFragmen
         favoriteButton.setOnClickListener {
             (context as MainActivity).addToFavorites(meme)
         }
-        Toast.makeText(requireContext(), "${meme.title} добавлен в избранное", Toast.LENGTH_SHORT).show()
     }
 
 
