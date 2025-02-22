@@ -1,16 +1,13 @@
-import android.content.Context
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.arefin.memeapp.DetailActivity
 import com.arefin.memeapp.Meme
 import com.arefin.memeapp.OnMemeClickListener
 import com.arefin.memeapp.R
-import com.google.firebase.database.ValueEventListener
-class MemeAdapter(
+
+class   MemeAdapter(
     private val memes: List<Meme>,
     private val listener: OnMemeClickListener
 ) : RecyclerView.Adapter<MemeAdapter.MemeViewHolder>() {

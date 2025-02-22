@@ -43,8 +43,9 @@ class DetailBottomSheetDialog(private val meme: Meme) : BottomSheetDialogFragmen
     }
 
     private fun addToFavorites(meme: Meme) {
-        // Логика для добавления мема в избранное
-        // Например, сохранение в SharedPreferences или базу данных
+        favoriteButton.setOnClickListener {
+            (context as MainActivity).addToFavorites(meme)
+        }
         Toast.makeText(requireContext(), "${meme.title} добавлен в избранное", Toast.LENGTH_SHORT).show()
     }
 }

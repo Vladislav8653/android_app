@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/meme_image"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"/>
+
+    <TextView
+        android:id="@+id/meme_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/button_add_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Добавить в избранные"/>
+
+    <Button
+        android:id="@+id/button_remove_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Убрать из избранных"
+        android:visibility="gone"/>
+
+</LinearLayout>

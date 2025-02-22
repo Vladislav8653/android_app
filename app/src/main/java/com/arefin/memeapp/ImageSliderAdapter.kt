@@ -1,12 +1,11 @@
 package com.arefin.memeapp
 
-import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.viewpager.widget.PagerAdapter
 import com.squareup.picasso.Picasso
+
 class ImageSliderAdapter(private val images: List<String>) : PagerAdapter() {
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {

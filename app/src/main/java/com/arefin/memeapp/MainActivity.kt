@@ -1,20 +1,19 @@
 package com.arefin.memeapp
 
 import MemeAdapter
-import android.app.AlertDialog
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
@@ -22,10 +21,13 @@ import com.google.firebase.database.ValueEventListener
 class MainActivity : AppCompatActivity(), OnMemeClickListener {
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var database: FirebaseDatabase
+    private lateinit var databaseReference: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        manageAuthorization();
+        manageAuthorization()
 
     }
 
@@ -52,7 +54,47 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
 
         enterButton.setOnClickListener {
             Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-            showMainList();
+            showDefaultMenu()
+        }
+    }
+
+    private fun showDefaultMenu() {
+        setContentView(R.layout.activity_main)
+
+        database = FirebaseDatabase.getInstance()
+        databaseReference = database.getReference("favorites")
+
+        showFragment(MemesFragment()) // Показываем список мемов по умолчанию
+
+        findViewById<Button>(R.id.btn_memes).setOnClickListener {
+            showFragment(MemesFragment())
+        }
+
+        findViewById<Button>(R.id.btn_favorites).setOnClickListener {
+            showFragment(FavoritesFragment())
+        }
+
+        findViewById<Button>(R.id.btn_profile).setOnClickListener {
+            //showFragment(ProfileFragment())
+        }
+    }
+
+    private fun showFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
+    }
+
+    fun addToFavorites(meme: Meme) {
+        val memeId = databaseReference.push().key // Генерируем уникальный ID
+        memeId?.let {
+            databaseReference.child(it).setValue(meme).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "${meme.title} добавлен в избранное", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Ошибка при добавлении в избранное", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -76,7 +118,6 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-                    showMainList();
                 } else {
                     Toast.makeText(this, "Login failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
@@ -86,17 +127,16 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
     private fun showMainList() {
         FirebaseApp.initializeApp(this)
         setContentView(R.layout.activity_main)
-        recyclerView = findViewById(R.id.recycler_view)
+        //recyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        loadMemes(this)
+        loadMemes()
     }
 
-    private lateinit var recyclerView: RecyclerView
 
-    private fun loadMemes(thisContext: Context) {
+    private fun loadMemes() {
         val databaseUrl = "https://memeapp-147f1-default-rtdb.europe-west1.firebasedatabase.app"
-        val database = FirebaseDatabase.getInstance(databaseUrl)
-        val databaseReference = database.getReference("memes")
+        database = FirebaseDatabase.getInstance(databaseUrl)
+        databaseReference = database.getReference("memes")
 
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -116,13 +156,7 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
     }
 
     override fun onMemeClick(meme: Meme) {
-        /*val intent = Intent(this, DetailActivity::class.java).apply {
-            putExtra("TITLE", meme.title)
-            putExtra("DESCRIPTION", meme.description)
-            putStringArrayListExtra("IMAGES", meme.images?.let { ArrayList(it) }) // Предполагается, что meme.images - это список изображений
-        }
-        startActivity(intent)
         val bottomSheet = DetailBottomSheetDialog(meme)
-        bottomSheet.show(supportFragmentManager, bottomSheet.tag)*/
+        bottomSheet.show(supportFragmentManager, bottomSheet.tag)
     }
 }
