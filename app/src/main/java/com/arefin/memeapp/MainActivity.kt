@@ -86,9 +86,10 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
     }
 
     fun addToFavorites(meme: Meme) {
-        val memeId = databaseReference.push().key // Генерируем уникальный ID
-        memeId?.let {
-            databaseReference.child(it).setValue(meme).addOnCompleteListener { task ->
+        meme.isFavorite = true // Устанавливаем isFavorite в true
+        // Обновляем мем в базе данных
+        meme.key?.let { key ->
+            databaseReference.child(key).setValue(meme).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "${meme.title} добавлен в избранное", Toast.LENGTH_SHORT).show()
                 } else {
@@ -97,6 +98,7 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
             }
         }
     }
+
 
     private fun registerUser(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password)
@@ -145,7 +147,7 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
                     val meme = snapshot.getValue(Meme::class.java)
                     meme?.let { memeList.add(it) }
                 }
-                val adapter = MemeAdapter(memeList, this@MainActivity) // Передаем текущую активность как слушатель
+                val adapter = MemeAdapter(memeList, this@MainActivity)
                 recyclerView.adapter = adapter
             }
 

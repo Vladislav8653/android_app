@@ -43,7 +43,7 @@ class MemesFragment : Fragment() {
                     val meme = snapshot.getValue(Meme::class.java)
                     meme?.let { memeList.add(it) }
                 }
-                val adapter = MemeAdapter(memeList, requireActivity() as MainActivity) // Передаем активность как слушатель
+                val adapter = MemeAdapter(memeList, requireActivity() as MainActivity)
                 recyclerView.adapter = adapter
             }
 
@@ -52,4 +52,5 @@ class MemesFragment : Fragment() {
             }
         })
     }
+
 }

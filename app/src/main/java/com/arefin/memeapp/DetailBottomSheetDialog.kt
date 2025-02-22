@@ -39,6 +39,7 @@ class DetailBottomSheetDialog(private val meme: Meme) : BottomSheetDialogFragmen
             addToFavorites(meme)
         }
 
+
         return view
     }
 
@@ -48,4 +49,6 @@ class DetailBottomSheetDialog(private val meme: Meme) : BottomSheetDialogFragmen
         }
         Toast.makeText(requireContext(), "${meme.title} добавлен в избранное", Toast.LENGTH_SHORT).show()
     }
+
+
 }
