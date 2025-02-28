@@ -16,7 +16,26 @@ class FavoritesFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var database: FirebaseDatabase
     private lateinit var databaseReference: DatabaseReference
-    private val favoriteMemes = mutableListOf<Meme>()
+    private var userId: String? = null
+
+    companion object {
+        private const val ARG_USER_ID = "user_id"
+
+        fun newInstance(userId: String): FavoritesFragment {
+            val fragment = FavoritesFragment()
+            val args = Bundle()
+            args.putString(ARG_USER_ID, userId)
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        userId = arguments?.getString(ARG_USER_ID)
+    }
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,54 +53,81 @@ class FavoritesFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val databaseUrl = "https://memeapp-147f1-default-rtdb.europe-west1.firebasedatabase.app"
         database = FirebaseDatabase.getInstance(databaseUrl)
-        databaseReference = database.getReference("memes")
-        loadFavorites()
+        loadFavorites { favoritesList ->
+            loadMemes(favoritesList)
+        }
+
     }
 
-    private fun loadFavorites() {
+    private fun loadMemes(favorites: List<Favorites>) {
+        databaseReference = database.getReference("memes")
+        var favoritesMemes: List<String>? = listOf();
+        for(item in favorites) {
+            if (item.userId == userId) {
+                favoritesMemes = item.memes;
+            }
+        }
+        if (favoritesMemes.isNullOrEmpty()) {
+            return;
+        }
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val favoriteMemes = mutableListOf<Meme>()
+                val memeList = mutableListOf<Meme>()
                 for (snapshot in dataSnapshot.children) {
                     val meme = snapshot.getValue(Meme::class.java)
+                    if (meme != null) {
+                        if(favoritesMemes.contains(meme.id)) {
+                            meme.let { memeList.add(it) }
+                        }
+                    }
+
                 }
-                // Обновите адаптер или UI с использованием списка favoriteMemes
-                updateFavoritesUI(favoriteMemes)
+                val adapter = MemeAdapter(memeList, requireActivity() as MainActivity)
+                recyclerView.adapter = adapter
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Toast.makeText(requireContext(), "Ошибка загрузки данных: ${databaseError.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Ошибка загрузки данных", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    // Метод для обновления интерфейса
-    private fun updateFavoritesUI(favoriteMemes: List<Meme>) {
-        val adapter = FavoriteMemeAdapter(favoriteMemes, requireActivity() as MainActivity) { meme, isAdding ->
-            if (isAdding) {
-                // Обработка добавления в избранные
-
-            } else {
-                // Обработка удаления из избранных
-                removeFromFavorites(meme)
+    private fun loadFavorites(callback: (List<Favorites>) -> Unit) {
+        databaseReference = database.getReference("favorites")
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val favoritesList = mutableListOf<Favorites>()
+                for (snapshot in dataSnapshot.children) {
+                    val favorite = snapshot.getValue(Favorites::class.java)
+                    if (favorite != null) {
+                        favoritesList.add(favorite)
+                    }
+                }
+                callback(favoritesList)
             }
-        }
 
-        recyclerView.adapter = adapter
+            override fun onCancelled(databaseError: DatabaseError) {
+                Toast.makeText(requireContext(), "Ошибка загрузки данных", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
+    fun addMemeToDatabase() {
+        // Получаем ссылку на базу данных
+        val database: DatabaseReference = FirebaseDatabase.getInstance().reference
 
-    private fun removeFromFavorites(meme: Meme) {
-        /*meme.isFavorite = false // Устанавливаем isFavorite в false
-        // Обновляем мем в базе данных
-        meme.key?.let { key ->
-            databaseReference.child(key).setValue(meme).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Toast.makeText(requireContext(), "${meme.title} убран из избранного", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(requireContext(), "Ошибка при удалении из избранного", Toast.LENGTH_SHORT).show()
+        // Создаем уникальный ключ для нового мема
+        val memeId = database.child("favorites").push().key
+
+        if (memeId != null) {
+            // Добавляем мем в базу данных
+            database.child("favorites").child(memeId).setValue("meme")
+                .addOnSuccessListener {
+                    println("Мем успешно добавлен!")
                 }
-            }
-        }*/
+                .addOnFailureListener {
+                    println("Ошибка при добавлении мема: ${it.message}")
+                }
+        }
     }
 }

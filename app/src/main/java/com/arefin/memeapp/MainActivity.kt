@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
         }
 
         enterButton.setOnClickListener {
-            Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
+            loginUser("are@m.com", "12345678")
             showDefaultMenu()
         }
     }
@@ -60,17 +60,18 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
     private fun showDefaultMenu() {
         setContentView(R.layout.activity_main)
 
-        database = FirebaseDatabase.getInstance()
-        databaseReference = database.getReference("favorites")
-
-        showFragment(MemesFragment()) // Показываем список мемов по умолчанию
+        showFragment(MemesFragment())
 
         findViewById<Button>(R.id.btn_memes).setOnClickListener {
             showFragment(MemesFragment())
         }
 
         findViewById<Button>(R.id.btn_favorites).setOnClickListener {
-            showFragment(FavoritesFragment())
+            val firebaseAuth = FirebaseAuth.getInstance()
+            val currentUser = firebaseAuth.currentUser
+            if (currentUser != null) {
+                showFragment(FavoritesFragment.newInstance(currentUser.uid))
+            }
         }
 
         findViewById<Button>(R.id.btn_profile).setOnClickListener {
