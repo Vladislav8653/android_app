@@ -86,9 +86,11 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
     }
 
     fun addToFavorites(meme: Meme) {
-        val ref = FirebaseDatabase.getInstance().getReference(databaseUrl).child("users").child("user1").child("interests")
-        ref.setValue(meme.id)
-        Toast.makeText(this, "Ready", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Добавлено в избранные", Toast.LENGTH_SHORT).show()
+    }
+
+    fun removeFromFavorites(meme: Meme) {
+        Toast.makeText(this, "Убрано из избранных", Toast.LENGTH_SHORT).show()
     }
 
 
@@ -119,29 +121,8 @@ class MainActivity : AppCompatActivity(), OnMemeClickListener {
     }
 
 
-    private fun loadMemes() {
-        database = FirebaseDatabase.getInstance(databaseUrl)
-        databaseReference = database.getReference("memes")
-
-        databaseReference.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val memeList = mutableListOf<Meme>()
-                for (snapshot in dataSnapshot.children) {
-                    val meme = snapshot.getValue(Meme::class.java)
-                    meme?.let { memeList.add(it) }
-                }
-                val adapter = MemeAdapter(memeList, this@MainActivity)
-                recyclerView.adapter = adapter
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Обработка ошибок
-            }
-        })
-    }
-
-    override fun onMemeClick(meme: Meme) {
-        val bottomSheet = DetailBottomSheetDialog(meme)
+    override fun onMemeClick(meme: Meme, btnName: String) {
+        val bottomSheet = DetailBottomSheetDialog(meme, btnName)
         bottomSheet.show(supportFragmentManager, bottomSheet.tag)
     }
 }

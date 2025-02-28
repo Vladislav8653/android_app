@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class DetailBottomSheetDialog(private val meme: Meme) : BottomSheetDialogFragment() {
+class DetailBottomSheetDialog(private val meme: Meme, private var btnName: String) : BottomSheetDialogFragment() {
 
     private lateinit var viewPager: ViewPager
     private lateinit var imageSliderAdapter: ImageSliderAdapter
@@ -25,6 +25,7 @@ class DetailBottomSheetDialog(private val meme: Meme) : BottomSheetDialogFragmen
         val titleTextView: TextView = view.findViewById(R.id.titleTextView)
         val descriptionTextView: TextView = view.findViewById(R.id.descriptionTextView)
         favoriteButton = view.findViewById(R.id.favoriteButton)
+        favoriteButton.text = btnName;
         viewPager = view.findViewById(R.id.viewPager)
 
         titleTextView.text = meme.title
@@ -36,17 +37,25 @@ class DetailBottomSheetDialog(private val meme: Meme) : BottomSheetDialogFragmen
 
         // Обработчик нажатия для добавления в избранное
         favoriteButton.setOnClickListener {
-            addToFavorites(meme)
+           manageFuture(meme)
         }
 
 
         return view
     }
 
-    private fun addToFavorites(meme: Meme) {
-        favoriteButton.setOnClickListener {
-            (context as MainActivity).addToFavorites(meme)
+    private fun manageFuture(meme: Meme) {
+        if (favoriteButton.text == "Добавить в избранное") {
+            favoriteButton.setOnClickListener {
+                (context as MainActivity).addToFavorites(meme)
+            }
+        } else if (favoriteButton.text == "Убрать из избранных") {
+            favoriteButton.setOnClickListener {
+                (context as MainActivity).removeFromFavorites(meme)
+            }
+
         }
+
     }
 
 

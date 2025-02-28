@@ -1,6 +1,5 @@
 package com.arefin.memeapp
 
-import MemeAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -82,7 +81,7 @@ class FavoritesFragment : Fragment() {
                     }
 
                 }
-                val adapter = MemeAdapter(memeList, requireActivity() as MainActivity)
+                val adapter = FavoriteMemeAdapter(memeList, requireActivity() as MainActivity)
                 recyclerView.adapter = adapter
             }
 

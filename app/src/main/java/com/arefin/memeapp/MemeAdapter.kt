@@ -20,7 +20,7 @@ class MemeAdapter(
             itemView.setOnClickListener {
                 val position = adapterPosition
                 val meme = memes[position]
-                listener.onMemeClick(meme)
+                listener.onMemeClick(meme, "Добавить в избранное")
             }
         }
     }

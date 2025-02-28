@@ -1,4 +1,4 @@
 package com.arefin.memeapp
 interface OnMemeClickListener {
-    fun onMemeClick(meme: Meme)
+    fun onMemeClick(meme: Meme, btnName: String)
 }
